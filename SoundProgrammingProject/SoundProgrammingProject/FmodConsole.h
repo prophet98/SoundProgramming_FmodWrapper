@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 class FmodConsole
 {
@@ -10,4 +11,7 @@ private:
 	void TakeInput();
 	void RefreshScreen();
 	void RenderScreen();
+
+	void PrintAllConsole();
+
 };

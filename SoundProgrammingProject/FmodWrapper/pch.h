@@ -9,5 +9,8 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
+#include <stdio.h>  /* defines FILENAME_MAX */
+#include <direct.h>
+#define GetCurrentDir _getcwd
 
 #endif //PCH_H
