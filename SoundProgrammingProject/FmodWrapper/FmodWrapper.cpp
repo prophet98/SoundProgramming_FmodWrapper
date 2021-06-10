@@ -38,15 +38,13 @@ CustomWrapper::~CustomWrapper()
 	//myMasterChannelGroup->release();
 }
 
-int CustomWrapper::LoadSound(const std::string soundName, float volume, bool is3d, bool isLooping, bool isStream)
+int CustomWrapper::LoadSound(const std::string soundName, bool isLooping, bool isStream)
 {
 
 	FMOD::Sound* soundPtr;
-	FMOD::Channel* ch;
 
 	FMOD_RESULT result{};
 	FMOD_MODE eMode = FMOD_DEFAULT;
-	eMode |= is3d ? FMOD_3D : FMOD_2D;
 	eMode |= isLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
 	eMode |= isStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
 	result = mSystem->createSound(soundName.c_str(), eMode, 0, &soundPtr);
@@ -71,12 +69,18 @@ int CustomWrapper::PlaySoundOnChannel(int sourceIndex, int channelNumber)
 
 	sound = mySounds[sourceIndex];
 	ch = myChannels[channelNumber];
-	//int play_channel = myChannelsMap[sourceIndex];
 
 	bool isPlaying = false;
-
 	ch->isPlaying(&isPlaying);
-	if (isPlaying)
+	bool isPaused = false;
+	ch->getPaused(&isPaused);
+
+	if (isPaused)
+	{
+		std::cout << "There was a paused sound here!...\n";
+		ch->setPaused(false);
+	}
+	else if (isPlaying)
 	{
 		std::cout << "There is already a sound on this channel! \nStop it before trying to play another one.\n";
 		return -1;
@@ -123,4 +127,54 @@ int CustomWrapper::StopSoundOnChannel(int channelNumber)
 		return -1;
 	}
 	
+}
+
+int CustomWrapper::PauseSoundOnChannel(int channelNumber)
+{
+	FMOD::Channel* channel;
+	FMOD_RESULT result;
+	channelNumber--;
+	channel = myChannels[channelNumber];
+	bool isPlaying = false;
+	channel->isPlaying(&isPlaying);
+	if (isPlaying)
+	{
+		result = channel->setPaused(true);
+		if (result != FMOD_OK)
+		{
+			return -1;
+		}
+		std::cout << "Stopping Channel... \n";
+		return 0;
+	}
+	else
+	{
+		std::cout << "There is no active sound on this channel\n";
+		return -1;
+	}
+}
+
+int CustomWrapper::SetSoundVolumeOnChannel(int channelNumber, float volume)
+{
+	FMOD::Channel* channel;
+	FMOD_RESULT result;
+	channelNumber--;
+	channel = myChannels[channelNumber];
+	bool isPlaying = false;
+	channel->isPlaying(&isPlaying);
+	if (isPlaying)
+	{
+		result = channel->setVolume(volume);
+		if (result != FMOD_OK)
+		{
+			return -1;
+		}
+		std::cout << "Modifying Channel Volume... \n";
+		return 0;
+	}
+	else
+	{
+		std::cout << "There is no active sound on this channel\n";
+		return -1;
+	}
 }

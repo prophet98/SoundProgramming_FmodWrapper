@@ -13,13 +13,15 @@ public:
 	CustomWrapper(int channelNumber);
 	~CustomWrapper();
 
-	int LoadSound(const std::string, float, bool, bool, bool);
+	int LoadSound(const std::string, bool, bool);
 
 	int PlaySoundOnChannel(int, int);
 
 	int StopSoundOnChannel(int);
 
-	FMOD_RESULT PauseChannel(int);
+	int PauseSoundOnChannel(int);
+
+	int SetSoundVolumeOnChannel(int, float);
 private:
 
 	FMOD::System* mSystem;

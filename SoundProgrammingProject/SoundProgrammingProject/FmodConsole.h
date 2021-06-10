@@ -8,10 +8,7 @@ public:
 	~FmodConsole();
 
 private:
-	void TakeInput();
 	void RefreshScreen();
-	void RenderScreen();
-
 	void PrintAllConsole();
 
 };
