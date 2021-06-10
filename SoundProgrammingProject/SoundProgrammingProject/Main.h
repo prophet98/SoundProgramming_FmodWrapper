@@ -11,6 +11,7 @@ void PlaySound();
 void StopSound();
 void PauseSound();
 void SetSoundVolume();
+void SetPanVolume();
 
 inline bool is_number(const std::string& s)
 {

@@ -49,7 +49,7 @@ void HandleInput(char input)
 	}
 	case 53: //5
 	{
-		isProgramClosed = true;
+		SetPanVolume();
 		break;
 	}
 	case 54: //6
@@ -190,7 +190,7 @@ void StopSound()
 
 void PauseSound()
 {
-	std::cout << "Choose channel to stop: ";
+	std::cout << "Choose channel to pause: ";
 	std::cin.ignore();
 	std::string new_channels;
 	getline(std::cin, new_channels);
@@ -244,6 +244,43 @@ void SetSoundVolume()
 
 		newVolume = std::stof(channelVolume) / 10;
 		int result = myPlayer->SetSoundVolumeOnChannel(channel, newVolume);
+		if (result == -1)
+			return;
+		else
+			std::cout << "Volume has been changed \n";
+	}
+}
+
+void SetPanVolume()
+{
+	std::cout << "Select a channel: ";
+	std::cin.ignore();
+	std::string new_channels;
+	getline(std::cin, new_channels);
+	int channel = 0;
+	if (!new_channels.empty())
+	{
+		channel = atoi(new_channels.c_str());
+	}
+
+	if (channel < 1 || channel > maxChannels)
+	{
+		std::cout << "FMod Channel Error \n";
+	}
+	else
+	{
+		std::string channelPan;
+		float newPan;
+		do
+		{
+			std::cin.clear();
+			std::cout << "Enter the new pan for this channel [-10 to 10]: ";
+			std::cin >> channelPan;
+
+		} while (!is_number(channelPan) || (std::stof(channelPan) > 10 || std::stof(channelPan) < -10));
+
+		newPan = std::stof(channelPan) / 10;
+		int result = myPlayer->SetSoundPanOnChannel(channel, newPan);
 		if (result == -1)
 			return;
 		else

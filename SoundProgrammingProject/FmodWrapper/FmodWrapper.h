@@ -22,6 +22,7 @@ public:
 	int PauseSoundOnChannel(int);
 
 	int SetSoundVolumeOnChannel(int, float);
+	int SetSoundPanOnChannel(int, float);
 private:
 
 	FMOD::System* mSystem;

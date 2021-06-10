@@ -178,3 +178,28 @@ int CustomWrapper::SetSoundVolumeOnChannel(int channelNumber, float volume)
 		return -1;
 	}
 }
+
+int CustomWrapper::SetSoundPanOnChannel(int channelNumber, float panValue)
+{
+	FMOD::Channel* channel;
+	FMOD_RESULT result;
+	channelNumber--;
+	channel = myChannels[channelNumber];
+	bool isPlaying = false;
+	channel->isPlaying(&isPlaying);
+	if (isPlaying)
+	{
+		result = channel->setPan(panValue);
+		if (result != FMOD_OK)
+		{
+			return -1;
+		}
+		std::cout << "Modifying Channel Volume... \n";
+		return 0;
+	}
+	else
+	{
+		std::cout << "There is no active sound on this channel\n";
+		return -1;
+	}
+}
