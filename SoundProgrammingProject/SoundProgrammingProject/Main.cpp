@@ -277,7 +277,7 @@ void SetPanVolume()
 			std::cout << "Enter the new pan for this channel [-10 to 10]: ";
 			std::cin >> channelPan;
 
-		} while (!is_number(channelPan) || (std::stof(channelPan) > 10 || std::stof(channelPan) < -10));
+		} while (!is_number(channelPan) && (std::stof(channelPan) > 10 || std::stof(channelPan) < -10));
 
 		newPan = std::stof(channelPan) / 10;
 		int result = myPlayer->SetSoundPanOnChannel(channel, newPan);
