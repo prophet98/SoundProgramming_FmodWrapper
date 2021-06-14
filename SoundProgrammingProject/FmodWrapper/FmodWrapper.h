@@ -13,6 +13,8 @@ public:
 	CustomWrapper(int channelNumber);
 	~CustomWrapper();
 
+	std::string absoulutePath;
+
 	int LoadSound(const std::string, bool, bool);
 
 	int PlaySoundOnChannel(int, int);
@@ -22,16 +24,19 @@ public:
 	int PauseSoundOnChannel(int);
 
 	int SetSoundVolumeOnChannel(int, float);
+
 	int SetSoundPanOnChannel(int, float);
+
+	void PrintChannelState();
+
 private:
 
 	FMOD::System* mSystem;
 
-	FMOD::Sound* mySoundPtr = nullptr;
-	std::map<int, FMOD::Sound*> mySounds;
+	std::map<int, FMOD::Sound*> mSounds;
 	int soundIndex;
 
-	std::map<int, int> myChannelsMap;
-	FMOD::Channel** myChannels = nullptr;
-	int m_AvailableChannels;
+	int userMaxChannels;
+	std::map<int, int> mChannelsMap;
+	FMOD::Channel** mChannel = nullptr;
 };

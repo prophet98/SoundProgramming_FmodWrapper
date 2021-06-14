@@ -3,13 +3,13 @@
 #include "FmodConsole.h"
 #include "Main.h"
 
-#define GetCurrentDir _getcwd 
-#define PATH_MAX_LENGTH 255 GetCurrentDir(c_absolute_path, PATH_MAX_LENGTH);
+
 int main()
 {
-	std::cout << "Welcome to the Custom Fmod Wrapper created by Alessandro Sciarra. \n\n\n";
-	myPlayer = new CustomWrapper(maxChannels);
-	FmodConsole* console = new FmodConsole();
+	std::cout << "Sound programming exam Alessandro Sciarra -- UniVR.\n";
+	customWrapper = new CustomWrapper(maxChannels);
+	std::cout << "You are currently using " << maxChannels << " channels.\n\n";
+	console = new FmodConsole();
 
 	char input;
 
@@ -28,7 +28,6 @@ void HandleInput(char input)
 	{
 	case 49: //1
 	{
-		std::cout << "Loading sound..." << std::endl;
 		LoadSound();
 		break;
 	}
@@ -57,6 +56,21 @@ void HandleInput(char input)
 		SetSoundVolume();
 		break;
 	}
+	case 55: //7
+	{
+		console->PrintInstructions();
+		break;
+	}
+	case 56: //8
+	{
+		customWrapper->PrintChannelState();
+		break;
+	}
+	case 57: //9
+	{
+		isProgramClosed = true;
+		break;
+	}
 	default:
 	{
 		break;
@@ -72,7 +86,7 @@ int GetSoundOptions()
 	std::string soundFileName;
 	getline(std::cin, soundFileName);
 
-	std::cout << "Allow sound looping?\n ";
+	std::cout << "Allow sound looping?\n";
 	std::string isLoopingInput;
 	bool isLooping;
 	do
@@ -81,8 +95,8 @@ int GetSoundOptions()
 		std::cout << "Enter Y or N: ";
 		std::cin >> isLoopingInput;
 
-	} while ((isLoopingInput.length()!=1) || ( isLoopingInput[0] != 'y' && isLoopingInput[0] != 'n' && isLoopingInput[0] != 'Y' && isLoopingInput[0] != 'N'));
-	
+	} while ((isLoopingInput.length() != 1) || (isLoopingInput[0] != 'y' && isLoopingInput[0] != 'n' && isLoopingInput[0] != 'Y' && isLoopingInput[0] != 'N'));
+
 	if (tolower(isLoopingInput[0]) == 'y')
 	{
 		isLooping = true;
@@ -92,7 +106,7 @@ int GetSoundOptions()
 		isLooping = false;
 	}
 
-	std::cout << "Load sound in streaming mode?\n ";
+	std::cout << "Load sound in streaming mode?\n";
 	std::cin.ignore();
 	std::string isStreamInput;
 	bool isStreaming;
@@ -112,17 +126,18 @@ int GetSoundOptions()
 		isStreaming = false;
 	}
 
-	int soundIndex = myPlayer->LoadSound(SoundPath + soundFileName, isLooping, isStreaming);
+	int soundIndex = customWrapper->LoadSound(customWrapper->absoulutePath + "\\" + soundFileName, isLooping, isStreaming);
 	if (soundIndex >= 0)
 	{
 		std::cout << "Loaded sound index is :" << soundIndex << std::endl;
 		return 0;
 	}
-
+	return -1;
 }
 
 void LoadSound()
 {
+	std::cout << "Loading sound..." << std::endl;
 	GetSoundOptions();
 }
 
@@ -154,7 +169,7 @@ void PlaySound()
 	}
 	else
 	{
-		int result = myPlayer->PlaySoundOnChannel(source_id, channel);
+		int result = customWrapper->PlaySoundOnChannel(source_id, channel);
 		if (result == -1)
 			return;
 		else
@@ -180,7 +195,7 @@ void StopSound()
 	}
 	else
 	{
-		int result = myPlayer->StopSoundOnChannel(channel);
+		int result = customWrapper->StopSoundOnChannel(channel);
 		if (result == -1)
 			return;
 		else
@@ -206,7 +221,7 @@ void PauseSound()
 	}
 	else
 	{
-		int result = myPlayer->PauseSoundOnChannel(channel);
+		int result = customWrapper->PauseSoundOnChannel(channel);
 		if (result == -1)
 			return;
 		else
@@ -243,7 +258,7 @@ void SetSoundVolume()
 		} while (!is_number(channelVolume) || (std::stof(channelVolume) > 10 || std::stof(channelVolume) < 1));
 
 		newVolume = std::stof(channelVolume) / 10;
-		int result = myPlayer->SetSoundVolumeOnChannel(channel, newVolume);
+		int result = customWrapper->SetSoundVolumeOnChannel(channel, newVolume);
 		if (result == -1)
 			return;
 		else
@@ -280,10 +295,10 @@ void SetPanVolume()
 		} while (!is_number(channelPan) && (std::stof(channelPan) > 10 || std::stof(channelPan) < -10));
 
 		newPan = std::stof(channelPan) / 10;
-		int result = myPlayer->SetSoundPanOnChannel(channel, newPan);
+		int result = customWrapper->SetSoundPanOnChannel(channel, newPan);
 		if (result == -1)
 			return;
 		else
-			std::cout << "Volume has been changed \n";
+			std::cout << "Pan has been changed \n";
 	}
 }

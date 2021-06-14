@@ -4,16 +4,23 @@
 #include "pch.h"
 #include "framework.h"
 #include "FmodWrapper.h"
-
+#define PATH_MAX_LENGTH 255
 using namespace FMOD;
 
 CustomWrapper::CustomWrapper(int channelNumber)
 {
 	FMOD_RESULT result;
-	myChannels = new FMOD::Channel * [channelNumber];
-
+	mChannel = new FMOD::Channel * [channelNumber];
 	result = System_Create(&mSystem);
-
+	std::cout << R"(
+______                   _   _    _                                 
+|  ___|                 | | | |  | |                                
+| |_ _ __ ___   ___   __| | | |  | |_ __ __ _ _ __  _ __   ___ _ __ 
+|  _| '_ ` _ \ / _ \ / _` | | |/\| | '__/ _` | '_ \| '_ \ / _ \ '__|
+| | | | | | | | (_) | (_| | \  /\  / | | (_| | |_) | |_) |  __/ |   
+\_| |_| |_| |_|\___/ \__,_|  \/  \/|_|  \__,_| .__/| .__/ \___|_|   
+                                             | |   | |              
+                                             |_|   |_|  )" << '\n';
 	if (result != FMOD_OK)
 	{
 		std::cout << "FMOD error:  " << result << "  " << FMOD_ErrorString(result) << std::endl;
@@ -25,22 +32,33 @@ CustomWrapper::CustomWrapper(int channelNumber)
 		std::cout << "FMOD error:  " << result << "  " << FMOD_ErrorString(result) << std::endl;
 		exit(-1);
 	}
-
+	userMaxChannels = channelNumber;
 	std::cout << "Initializing FmodSystem...\nChecking Errors..." << std::endl;
-	std::cout << FMOD_ErrorString(result) << std::endl;
+	std::cout << FMOD_ErrorString(result) << "\n\n";
 
-	std::cout << "\n\n";
+	char soundPath[PATH_MAX_LENGTH];
+
+	GetCurrentDir(soundPath, PATH_MAX_LENGTH);
+
+	if (absoulutePath.empty())
+	{
+		absoulutePath = std::string(soundPath);
+	}
+
+	std::cout << "Your sounds must be inside the following path or else they wont be played: \n" << absoulutePath.c_str() << std::endl << std::endl;
+
 }
 
 
 CustomWrapper::~CustomWrapper()
 {
-	//myMasterChannelGroup->release();
+	mSystem->release();
+	delete mSystem;
+	delete mChannel;
 }
 
 int CustomWrapper::LoadSound(const std::string soundName, bool isLooping, bool isStream)
 {
-
 	FMOD::Sound* soundPtr;
 
 	FMOD_RESULT result{};
@@ -55,7 +73,7 @@ int CustomWrapper::LoadSound(const std::string soundName, bool isLooping, bool i
 	}
 	std::cout << "The sound source has been loaded \n";
 
-	mySounds[soundIndex] = soundPtr;
+	mSounds[soundIndex] = soundPtr;
 	soundIndex++;
 	return soundIndex - 1;
 }
@@ -67,8 +85,8 @@ int CustomWrapper::PlaySoundOnChannel(int sourceIndex, int channelNumber)
 	channelNumber--;
 	FMOD_RESULT result;
 
-	sound = mySounds[sourceIndex];
-	ch = myChannels[channelNumber];
+	sound = mSounds[sourceIndex];
+	ch = mChannel[channelNumber];
 
 	bool isPlaying = false;
 	ch->isPlaying(&isPlaying);
@@ -95,10 +113,12 @@ int CustomWrapper::PlaySoundOnChannel(int sourceIndex, int channelNumber)
 			return -1;
 		}
 
-		myChannels[channelNumber] = ch;
-		myChannelsMap[sourceIndex] = channelNumber;
+		mChannel[channelNumber] = ch;
+		mChannelsMap[channelNumber] = channelNumber + 1;
 		return 0;
 	}
+
+	return -1;
 
 }
 int CustomWrapper::StopSoundOnChannel(int channelNumber)
@@ -106,7 +126,7 @@ int CustomWrapper::StopSoundOnChannel(int channelNumber)
 	FMOD::Channel* channel;
 	FMOD_RESULT result;
 	channelNumber--;
-	channel = myChannels[channelNumber];
+	channel = mChannel[channelNumber];
 	bool isPlaying = false;
 	channel->isPlaying(&isPlaying);
 	if (isPlaying)
@@ -117,7 +137,7 @@ int CustomWrapper::StopSoundOnChannel(int channelNumber)
 			return -1;
 		}
 
-		myChannelsMap[channelNumber] = 0;
+		mChannelsMap[channelNumber] = 0;
 		std::cout << "Stopping Channel... \n";
 		return 0;
 	}
@@ -126,7 +146,7 @@ int CustomWrapper::StopSoundOnChannel(int channelNumber)
 		std::cout << "There is no active sound on this channel\n";
 		return -1;
 	}
-	
+
 }
 
 int CustomWrapper::PauseSoundOnChannel(int channelNumber)
@@ -134,7 +154,7 @@ int CustomWrapper::PauseSoundOnChannel(int channelNumber)
 	FMOD::Channel* channel;
 	FMOD_RESULT result;
 	channelNumber--;
-	channel = myChannels[channelNumber];
+	channel = mChannel[channelNumber];
 	bool isPlaying = false;
 	channel->isPlaying(&isPlaying);
 	if (isPlaying)
@@ -159,7 +179,7 @@ int CustomWrapper::SetSoundVolumeOnChannel(int channelNumber, float volume)
 	FMOD::Channel* channel;
 	FMOD_RESULT result;
 	channelNumber--;
-	channel = myChannels[channelNumber];
+	channel = mChannel[channelNumber];
 	bool isPlaying = false;
 	channel->isPlaying(&isPlaying);
 	if (isPlaying)
@@ -184,7 +204,7 @@ int CustomWrapper::SetSoundPanOnChannel(int channelNumber, float panValue)
 	FMOD::Channel* channel;
 	FMOD_RESULT result;
 	channelNumber--;
-	channel = myChannels[channelNumber];
+	channel = mChannel[channelNumber];
 	bool isPlaying = false;
 	channel->isPlaying(&isPlaying);
 	if (isPlaying)
@@ -194,12 +214,29 @@ int CustomWrapper::SetSoundPanOnChannel(int channelNumber, float panValue)
 		{
 			return -1;
 		}
-		std::cout << "Modifying Channel Volume... \n";
+		std::cout << "Modifying Channel Pan... \n";
 		return 0;
 	}
 	else
 	{
 		std::cout << "There is no active sound on this channel\n";
 		return -1;
+	}
+}
+
+void CustomWrapper::PrintChannelState()
+{
+	bool isChannelInUse = false;
+	for (int i = 0; i < userMaxChannels; i++)
+	{
+		if (mChannelsMap[i] != 0)
+		{
+			std::cout << "You are currently using channel number : " << i + 1 << std::endl;
+			isChannelInUse = true;
+		}
+	}
+	if (!isChannelInUse)
+	{
+		std::cout << "There are no active playing channels at the moment, please play a loaded sound in a channel.\n" << std::endl;
 	}
 }

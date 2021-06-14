@@ -12,5 +12,4 @@
 #include <stdio.h>  /* defines FILENAME_MAX */
 #include <direct.h>
 #define GetCurrentDir _getcwd
-
 #endif //PCH_H
