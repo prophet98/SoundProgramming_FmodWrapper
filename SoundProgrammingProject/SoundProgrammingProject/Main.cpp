@@ -3,7 +3,6 @@
 #include "FmodConsole.h"
 #include "Main.h"
 
-
 int main()
 {
 	std::cout << "Sound programming exam Alessandro Sciarra -- UniVR.\n";
@@ -19,6 +18,10 @@ int main()
 
 		HandleInput(input);
 	}
+	delete customWrapper;
+	customWrapper = nullptr;
+	delete console;
+	console = nullptr;
 	return 0;
 }
 

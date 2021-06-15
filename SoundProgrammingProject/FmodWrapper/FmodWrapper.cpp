@@ -1,5 +1,3 @@
-// FmodWrapper.cpp : Defines the functions for the static library.
-//
 
 #include "pch.h"
 #include "framework.h"
@@ -53,8 +51,9 @@ ______                   _   _    _
 CustomWrapper::~CustomWrapper()
 {
 	mSystem->release();
-	delete mSystem;
+	mSystem = nullptr;
 	delete mChannel;
+	mChannel = nullptr;
 }
 
 int CustomWrapper::LoadSound(const std::string soundName, bool isLooping, bool isStream)
@@ -82,7 +81,7 @@ int CustomWrapper::PlaySoundOnChannel(int sourceIndex, int channelNumber)
 {
 	FMOD::Sound* sound;
 	FMOD::Channel* ch;
-	channelNumber--;
+	channelNumber--; //decrement so that we use the correct index inside the array, increment it later to show it to the player.
 	FMOD_RESULT result;
 
 	sound = mSounds[sourceIndex];
@@ -114,7 +113,7 @@ int CustomWrapper::PlaySoundOnChannel(int sourceIndex, int channelNumber)
 		}
 
 		mChannel[channelNumber] = ch;
-		mChannelsMap[channelNumber] = channelNumber + 1;
+		mChannelsMap[channelNumber] = channelNumber + 1; //increment by one because I do not want the channels to be 0 based.
 		return 0;
 	}
 
@@ -143,7 +142,7 @@ int CustomWrapper::StopSoundOnChannel(int channelNumber)
 	}
 	else
 	{
-		std::cout << "There is no active sound on this channel\n";
+		std::cout << "There is no sound to be stopped on this channel\n";
 		return -1;
 	}
 
@@ -164,12 +163,12 @@ int CustomWrapper::PauseSoundOnChannel(int channelNumber)
 		{
 			return -1;
 		}
-		std::cout << "Stopping Channel... \n";
+		std::cout << "Pausing Channel... \n";
 		return 0;
 	}
 	else
 	{
-		std::cout << "There is no active sound on this channel\n";
+		std::cout << "There is no sound to be paused on this channel\n";
 		return -1;
 	}
 }

@@ -34,9 +34,9 @@ private:
 	FMOD::System* mSystem;
 
 	std::map<int, FMOD::Sound*> mSounds;
-	int soundIndex;
+	int soundIndex = 0;
 
-	int userMaxChannels;
+	int userMaxChannels = 0;
 	std::map<int, int> mChannelsMap;
 	FMOD::Channel** mChannel = nullptr;
 };
