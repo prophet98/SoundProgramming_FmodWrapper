@@ -1,9 +1,6 @@
 #include "FmodConsole.h"
-#include <iostream>
 #include "FmodWrapper.h"
 #include "pch.h"
-
-
 
 void FmodConsole::RefreshScreen()
 {
@@ -33,8 +30,6 @@ void FmodConsole::PrintInstructions()
 
 	PrintAllConsole();
 }
-
-
 
 FmodConsole::FmodConsole()
 {
